@@ -154,9 +154,8 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            users = User(
+            user = User(
                 username=form.cleaned_data['username'],
-                password=form.cleaned_data['password1'],
                 is_staff=True,
                 is_active=True,
                 is_superuser=True,
@@ -164,11 +163,9 @@ def register(request):
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
             )
-            try:
-                users.full_clean()
-            except ValidationError as e:
-                pass
-            users.save()
+            # Set the password properly
+            user.set_password(form.cleaned_data['password1'])
+            user.save()
             messages.success(request, 'Member was created successfully!')
             return HttpResponseRedirect('/register/success/')
     else:
